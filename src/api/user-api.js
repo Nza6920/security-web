@@ -9,7 +9,3 @@ export function logout() {
     return Vue.prototype.$axios.post(`${loginBff}/users/logout`)
 }
 
-export function me() {
-    return Vue.prototype.$axios.get(`${loginBff}/users/me`)
-}
-
