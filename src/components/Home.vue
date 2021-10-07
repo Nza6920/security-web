@@ -13,6 +13,7 @@
 <script>
 import * as orderApi from '../api/order-api.js'
 import * as userApi from '../api/user-api.js'
+import Vue from "vue";
 
 export default {
   name: "Home",
@@ -33,6 +34,8 @@ export default {
     logout() {
       const _this = this
       userApi.logout().then(() => {
+        Vue.prototype.$cookies.remove("access_token", "/", ".niu.com")
+        Vue.prototype.$cookies.remove("refresh_token", "/", ".niu.com")
         _this.$emit('toLogin')
       })
     }

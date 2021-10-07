@@ -8,6 +8,7 @@
 import Home from './components/Home.vue'
 import * as constants from "@/common/constant";
 import * as userApi from "@/api/user-api";
+import Vue from "vue";
 
 export default {
   name: 'App',
@@ -32,6 +33,7 @@ export default {
   },
   methods: {
     me() {
+      console.log(Vue.prototype.$cookies.keys());
       localStorage.removeItem(constants.TOKEN);
       return userApi.me().then((res) => {
         if (res.data) {
