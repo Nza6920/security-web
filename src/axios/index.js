@@ -2,16 +2,17 @@
 import axios from "axios";
 import Vue from "vue";
 import * as constants from '../common/constant'
+import * as userApi from '../api/user-api'
 
-// 3. 配置信息
+// 2. 配置信息
 let config = {
-    // 每次请求的协议、IP地址。  设置该配置后，每次请求路径都可以使用相对路径，例如"/admin/login"
+    // 每次请求的协议、IP地址。设置该配置后，每次请求路径都可以使用相对路径，例如"/admin/login"
     baseURL: "http://admin.niu.com:17016",
     // 请求超时时间
     timeout: 60000
 }
 
-// 2. 创建实例
+// 3. 创建实例
 const instance = axios.create(config)
 
 // 1. 请求拦截
@@ -40,10 +41,28 @@ instance.interceptors.response.use(
     // 处理错误响应
     err => {
         console.log("error response: ", err)
-        Vue.prototype.$message.error('服务器异常, 请联系管理员.')
+        // 如果 token 失效, 刷新 token
+        if (err.response.status === 401) {
+            let token = JSON.parse(localStorage.getItem(constants.TOKEN))
+            return userApi.refreshToken({refreshToken: token.refresh_token}).then((res) => {
+                // 重新设置 token
+                localStorage.setItem(constants.TOKEN, JSON.stringify(res.data))
+                err.config.headers["Authorization"] = `Bearer ${token.access_token}`
+                return instance.request(err.config);
+            }).catch(err2 => {
+                // refresh token 过期
+                userApi.logout().then(() => {
+                    // 失效认证服务器的 session
+                    window.location.href = 'http://auth.niu.com:7046/logout?redirect_uri=http://admin.niu.com:17016'
+                })
+                return Promise.reject(err2)
+            });
+        } else {
+            Vue.prototype.$message.error('服务器异常, 请联系管理员.')
+        }
         return Promise.reject(err);
     }
 );
 
-// 4. 导出
+// 3. 导出
 export default instance

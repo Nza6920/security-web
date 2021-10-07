@@ -1,13 +1,10 @@
 <template>
   <div id="app">
-    <!--    <Login v-if="showLogin" @toHome="handleToHome"/>-->
-    <!--    <Home v-else @toLogin="handleToLogin"/>-->
-    <Home @toLogin="handleLogout"/>
+    <Home v-if="authorization" @toLogin="handleLogout"/>
   </div>
 </template>
 
 <script>
-// import Login from './components/Login.vue'
 import Home from './components/Home.vue'
 import * as constants from "@/common/constant";
 import * as userApi from "@/api/user-api";
@@ -15,7 +12,6 @@ import * as userApi from "@/api/user-api";
 export default {
   name: 'App',
   components: {
-    // Login,
     Home
   },
   mounted() {
@@ -31,7 +27,6 @@ export default {
   },
   data() {
     return {
-      showLogin: true,
       authorization: false
     }
   },
@@ -45,19 +40,14 @@ export default {
         }
       })
     },
-    handleToHome() {
-      this.showLogin = false
-    },
-    handleToLogin() {
-      this.showLogin = true
-    },
     handleLogout() {
-      console.log('logout')
+      this.authorization = false
+      // 失效认证服务器的 session
+      window.location.href = 'http://auth.niu.com:7046/logout?redirect_uri=http://admin.niu.com:17016'
     },
   }
 }
 </script>
-
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

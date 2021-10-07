@@ -13,3 +13,7 @@ export function me() {
     return Vue.prototype.$axios.get(`${loginBff}/users/me`)
 }
 
+export function refreshToken(obj) {
+    return Vue.prototype.$axios.post(`${loginBff}/users/refreshToken`, obj)
+}
+
